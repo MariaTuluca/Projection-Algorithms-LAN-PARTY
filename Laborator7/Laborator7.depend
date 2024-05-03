@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1712650948 source:c:\users\maria\desktop\pa\main.c
+	"dendogram.h"
+
+1712650449 c:\users\maria\desktop\pa\dendogram.h
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+
+1712648571 source:c:\users\maria\desktop\pa\dendogram.c
+	"dendogram.h"
+	<stdlib.h>
+	<stdio.h>
+

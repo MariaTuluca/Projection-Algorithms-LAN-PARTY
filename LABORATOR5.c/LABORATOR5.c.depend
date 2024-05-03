@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1711450389 source:c:\users\maria\desktop\pa\laborator5.c\main.c
+	"stive.h"
+
+1711441927 source:c:\users\maria\desktop\pa\laborator5.c\stive.c
+	"stive.h"
+
+1712045878 c:\users\maria\desktop\pa\laborator5.c\stive.h
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
