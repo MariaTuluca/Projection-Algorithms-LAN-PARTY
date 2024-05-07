@@ -12,3 +12,6 @@ void datePlayer(FILE *f_date, Player **newPlayer);
 void readPlayers(FILE *file_date, ListOfPlayers **playerList, int nrPlayersOfTeam);
 
 void writeNamesOfTeams(ListOfTeams *teamList, char *fileOut);
+
+void findTeamForElimination(ListOfTeams **teamList, ListOfTeams **eliminatedTeam);
+

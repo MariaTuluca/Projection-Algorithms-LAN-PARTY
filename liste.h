@@ -11,17 +11,17 @@ typedef struct Player {
     int points;
 }Player;
 
-// structură de date - informații despre fiecare echipă
-typedef struct Team {
-    char *name;
-    ListOfPlayers *players;
-}Team;
-
 // structură de date - listă cu informații despre fiecare jucător
 typedef struct ListOfPlayers {
     Player *player;
     struct ListOfPlayers *next;
 }ListOfPlayers;
+
+// structură de date - informații despre fiecare echipă
+typedef struct Team {
+    char *name;
+    ListOfPlayers *players;
+}Team;
 
 // structură de date - listă cu informații despre fiecare echipă
 typedef struct ListOfTeams {
@@ -34,3 +34,7 @@ void addPlayerToList(ListOfPlayers **playerList, Player *player);
 void addListOfPlayersToTeam(Team **newTeam, ListOfPlayers *playerList);
 
 void addTeamToTeamList(ListOfTeams **teamList, Team *newTeam);
+
+void freeListOfPlayers(ListOfPlayers **playerList);
+
+void deleteTeam(ListOfTeams **teamList, ListOfTeams *eliminatedTeam);
