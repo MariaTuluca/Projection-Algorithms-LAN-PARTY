@@ -131,3 +131,26 @@ void findTeamForElimination(ListOfTeams **teamList, ListOfTeams **eliminatedTeam
         aux_teamList = aux_teamList->next;   //trec la analizarea urmatoarei echipe
     }    
 }
+
+float ScoreOfTeam(Team *team)
+{//asemănătoare cu "if"-ul din funcția de mai sus
+    if(team != NULL)
+        {
+            int total_points=0;
+            int numberOfPlayers = 0;
+            //folosindu-mă de listă, trec pe la fiecare player pentru a lua în considerare punctele lui
+            ListOfPlayers *aux_playerList = team->players;
+            while(aux_playerList != NULL)
+            {
+                total_points += aux_playerList->player->points;
+                numberOfPlayers++;
+                aux_playerList = aux_playerList->next;
+            }
+
+            //calculez media pentru echipa curenta
+            float avgTeam_score = (float)total_points/numberOfPlayers;
+            return avgTeam_score;
+        }
+    else return 0;
+    
+}
