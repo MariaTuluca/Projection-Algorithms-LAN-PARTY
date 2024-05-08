@@ -1,5 +1,5 @@
 // acest header conține apeluri de funcții ajutătoare
-// pentru program
+// pentru programul meu
 
 #include<stdio.h>
 #include<string.h>

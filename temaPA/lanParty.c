@@ -101,7 +101,7 @@ void alTreileaTask(ListOfTeams **teamList, ListOfTeams **the8Finalists, char *fi
 }
 
 void alPatruleaTask(ListOfTeams *the8Finalists, ListOfTeams **the8FinalistsInDescendingOrder, char *fileOUT)
-{//inițializez bst-ul și îl creez
+{//inițializez bst-ul și îl creez în ordine descrescătoare
     BSTNode *bst_root = NULL;
     createBST(&bst_root, the8Finalists);
 

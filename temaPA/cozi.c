@@ -59,7 +59,7 @@ void deleteQueue(Queue *q)
     q = NULL;
 }
 
-//funcție pentru refacere coadă de meciuri
+//funcție pentru refacerea cozii de meciuri
 void remakeQueueOfMatches(Queue *matches, StackNode **winners, int *numberOfTeams)
 {//inițializez numărul de teams din stivă cu 0
     *numberOfTeams = 0;

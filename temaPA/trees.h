@@ -1,7 +1,7 @@
 #include<stdlib.h>
 #include "liste.h"
 
-//funcții pentru arbori
+//funcții create și luate din curs pentru arbori
 
 //structură pentru binary search tree (BST)
 typedef struct bstNode

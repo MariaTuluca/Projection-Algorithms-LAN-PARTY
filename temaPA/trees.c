@@ -45,7 +45,7 @@ void createBST(BSTNode **bst_root, ListOfTeams *the8Finalists)
 
 //funcție pentru includere echipă în listă la final
 void TeamToTeamList(ListOfTeams **BSTlist, Team *team)
-{//creez un nod nou pentru listă
+{//creez un nod nou pentru lista de BST 
     ListOfTeams *new_node = malloc(sizeof(ListOfTeams));
     if(new_node == NULL)
         {

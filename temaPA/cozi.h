@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include "stive.h"
 
-// două structuri pentru definirea cozii 
+// două structuri pentru definirea cozilor
 typedef struct queueNode{
     Match *subject;
     struct queueNode *next;

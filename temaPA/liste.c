@@ -159,7 +159,7 @@ void listOfThe8Finalists(QueueNode *matchNode, ListOfTeams **the8Finalists)
 void populateQueue(Queue **matches, ListOfTeams *teamList)
 {   //creez coada
     *matches = createQueue();
-    //verific dacă am două echipe valabile pentru un nou meci
+    //verific dacă am două echipe valabile pentru meci nou
     for( ; teamList != NULL && teamList->next != NULL; teamList = teamList->next->next)
     {
         Match *new_match = malloc(sizeof(Match));

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "cozi.h"
 
-//acest header este special pentru operații cu liste
+//acest header este special pentru operații cu liste(adiacent și cozi)
 
 // structură de date - informații despre fiecare jucător
 typedef struct Player {    

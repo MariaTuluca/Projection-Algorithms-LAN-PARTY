@@ -96,7 +96,7 @@ void writeNamesOfTeams(ListOfTeams *teamList, char *fileOut)
     fclose(f);
 }
 
-//funcție pentru determinare echipe eligibile pentru eliminare
+//funcție pentru determinarea echipelor eligibile pentru eliminare
 void findTeamForElimination(ListOfTeams **teamList, ListOfTeams **eliminatedTeam)
 {
     ListOfTeams *aux_teamList = *teamList;
