@@ -2,7 +2,7 @@
 #include "cozi.h"
 #include "functii-ajutatoare.h"
 
-//fișier cu funcții pentru stive
+//fișier cu funcții pentru stive, create, dar și prelucrate din curs
 
 Team *top(StackNode *top)
 {

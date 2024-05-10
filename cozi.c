@@ -59,28 +59,7 @@ void deleteQueue(Queue *q)
     q = NULL;
 }
 
-
-//funcție pentru umplere coadă cu meciuri
-void populateQueue(Queue **matches, ListOfTeams *teamList)
-{   //creez coada
-    *matches = createQueue();
-    //verific dacă am două echipe valabile pentru un nou meci
-    for( ; teamList != NULL && teamList->next != NULL; teamList = teamList->next->next)
-    {
-        Match *new_match = malloc(sizeof(Match));
-        if(new_match == NULL)
-        {   printf("Eroare la alocare spațiu pentru un meci nou.\n");
-            return 1;
-        }
-        //creez meciul nou și îl pun în coadă
-        new_match->team_1 = teamList->team;
-        new_match->team_2 = (teamList->next)->team;
-        enQueue(*matches, new_match);
-    }
-
-}
-
-//funcție pentru refacere coadă de meciuri
+//funcție pentru refacerea cozii de meciuri
 void remakeQueueOfMatches(Queue *matches, StackNode **winners, int *numberOfTeams)
 {//inițializez numărul de teams din stivă cu 0
     *numberOfTeams = 0;

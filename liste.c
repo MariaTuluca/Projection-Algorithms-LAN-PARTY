@@ -1,5 +1,4 @@
 #include "liste.h"
-#include "cozi.h"
 
 //acest fișier conține funcții specifice listelor
 
@@ -30,7 +29,7 @@ void addListOfPlayersToTeam(Team **newTeam, ListOfPlayers *playerList)
     (*newTeam)->players = playerList;
 }
 
-//funcție pentru adăugarea echipei formate la finalul listei de echipe
+//funcție pentru adăugarea echipei formate la începutul listei de echipe
 void addTeamToTeamList(ListOfTeams **teamList, Team *newTeam)
 {
     ListOfTeams *newNode = malloc(sizeof(ListOfTeams));
@@ -154,4 +153,37 @@ void listOfThe8Finalists(QueueNode *matchNode, ListOfTeams **the8Finalists)
 	if(matchNode->next != NULL)
 		listOfThe8Finalists(the8Finalists, matchNode->next);
 		
+}
+
+//funcție pentru umplere coadă cu meciuri
+void populateQueue(Queue **matches, ListOfTeams *teamList)
+{   //creez coada
+    *matches = createQueue();
+    //verific dacă am două echipe valabile pentru meci nou
+    for( ; teamList != NULL && teamList->next != NULL; teamList = teamList->next->next)
+    {
+        Match *new_match = malloc(sizeof(Match));
+        if(new_match == NULL)
+        {   printf("Eroare la alocare spațiu pentru un meci nou.\n");
+            return 1;
+        }
+        //creez meciul nou și îl pun în coadă
+        new_match->team_1 = teamList->team;
+        new_match->team_2 = (teamList->next)->team;
+        enQueue(*matches, new_match);
+    }
+
+}
+
+void freeListOfTeams(ListOfTeams **teamList)
+{
+    while(*teamList != NULL)
+    {   //creez un auxiliar în care rețin jucătorul
+        free((*teamList)->team->name);  //eliberez numele
+        freeListOfPlayers(&(*teamList)->team->players);  //apoi lista de players
+        free(*teamList); //apoi chiar lista
+        *teamList = NULL;  //good practice
+        
+        *teamList = (*teamList)->next;   //actualizez capătul listei
+    }
 }

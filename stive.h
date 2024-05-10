@@ -1,6 +1,7 @@
 #include<limits.h>
 #include "liste.h"
 
+//header pentru stive
 typedef struct stackNode{
     Team *subject;
     struct stackNode *next;

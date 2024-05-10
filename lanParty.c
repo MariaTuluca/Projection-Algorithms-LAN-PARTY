@@ -2,6 +2,7 @@
 #include "functii-ajutatoare.h"
 #include "cozi.h"
 #include "stive.h"
+#include "trees.h"
 
 void primulTask(ListOfTeams **teamList, int *numberOfTeams, char *fileIn, char* fileOut)
 {
@@ -78,9 +79,9 @@ void alTreileaTask(ListOfTeams **teamList, ListOfTeams **the8Finalists, char *fi
               writeTheMatchFormated(aux->subject, fileOUT);
               aux = aux->next;
             }
+            fclose(fout);
         }
 
-        fclose(fout);
         StackNode *losers = NULL; //creez stiva pentru învinși
 
         winnersAndLosersStacks(&winners, &losers, matches);
@@ -97,6 +98,45 @@ void alTreileaTask(ListOfTeams **teamList, ListOfTeams **the8Finalists, char *fi
     //eliberez spațiul folosit de stiva de câștigători și coada de meciuri
     deleteQueue(matches);
     deleteStack(&winners);
+}
+
+void alPatruleaTask(ListOfTeams *the8Finalists, ListOfTeams **the8FinalistsInDescendingOrder, char *fileOUT)
+{//inițializez bst-ul și îl creez în ordine descrescătoare
+    BSTNode *bst_root = NULL;
+    createBST(&bst_root, the8Finalists);
+
+    //afișăm în ordine descrescătoare clasamentul cu ajutorul arborelui
+    FILE *fout;
+    if((fout = fopen(fileOUT, "wt") == NULL))
+    {    fprintf(fout, "\nTOP 8 TEAMS:\n");
+            fclose(fout);
+    }
+    afișareBST(bst_root, the8FinalistsInDescendingOrder, fileOUT);
+    //eliberez memoria ocupată de bst ul 
+    deleteBST(bst_root);
+}
+
+void alCincileaTask(ListOfTeams *the8FinalistsInDescendingOrder, char *fileOUT)
+{//inițializez arborele AVL
+    AVLNode *AVL_root = NULL;
+
+    while(the8FinalistsInDescendingOrder != NULL)
+    {//introduc echipa în acesta
+        AVL_root = AVL_insertion(the8FinalistsInDescendingOrder->team, AVL_root);
+    //trec la următoarea
+        the8FinalistsInDescendingOrder = the8FinalistsInDescendingOrder->next;
+    }
+
+    //scriu în fișier cu forma cerută
+    FILE *f;
+    if((f = fopen(fileOUT, "wt")) != NULL)
+        fprintf(f, "\nTHE LEVEL 2 TEAMS ARE:\n");
+    fclose(f);
+    //inițiez o parcurgere DRS pentru afișare în ordine descrescătoare a scorurilor
+    int lvl = -1;
+    AVL_DRSbrowse(AVL_root, fileOUT, lvl);
+    //eliberez memoria ocupată de AVL
+    deleteAVL(AVL_root);
 }
 
 //funcția main cu apelurile către fiecare task
@@ -131,4 +171,14 @@ int main(int argc, char* argv[])
 
     freeListOfTeams(&teamList);
 
+    ListOfTeams *the8FinalistsInDescendingOrder = NULL;
+    if(tasks[3] == 1)
+            alPatruleaTask(the8Finalists, &the8FinalistsInDescendingOrder, argv[3]);
+
+    if (tasks[4] == 1)
+            alCincileaTask(the8FinalistsInDescendingOrder, argv[3]);
+    
+    freeListOfTeams(&the8FinalistsInDescendingOrder);
+
+    return 0;
 }

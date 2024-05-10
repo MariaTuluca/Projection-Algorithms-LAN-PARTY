@@ -1,5 +1,5 @@
 // acest header conține apeluri de funcții ajutătoare
-// pentru program
+// pentru programul meu
 
 #include<stdio.h>
 #include<string.h>
@@ -17,3 +17,5 @@ void writeNamesOfTeams(ListOfTeams *teamList, char *fileOut);
 void findTeamForElimination(ListOfTeams **teamList, ListOfTeams **eliminatedTeam);
 
 float ScoreOfTeam(Team *team);
+
+int max(int a, int b);
