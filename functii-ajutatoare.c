@@ -16,7 +16,7 @@ void readTeamName(FILE *f, Team **newTeam)
     else{ 
         int lung = strlen(teamName);
         while(lung>0 && (teamName[lung-1] == '\n'||teamName[lung-1] == '\r'||teamName[lung-1] == ' '))
-            {
+            {//verific ultimul caracter din nume și îl actualizez
                 teamName[--lung] = '\0';
             }
 

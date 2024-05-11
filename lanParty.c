@@ -21,11 +21,11 @@ void primulTask(ListOfTeams **teamList, int *numberOfTeams, char *fileIn, char* 
         ListOfPlayers *playerList = NULL;
 
         fscanf(inputDate, "%d", nrPlayersOfTeam);
-        fgetc(inputDate);
+        fgetc(inputDate); //golesc buffer
         //citesc datele pentru players
         readTeamName(inputDate, &newTeam);
         readPlayers(inputDate, &playerList, nrPlayersOfTeam);
-        fgetc(inputDate);
+        fgetc(inputDate); 
 
         addListOfPlayersToTeam(&newTeam, playerList);
         addTeamToTeamList(teamList, newTeam);

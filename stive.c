@@ -91,7 +91,6 @@ void onePointToEveryWinnerPlayer(StackNode *winners)
 	}
 }
 
-
 //funcție pentru afișare meci în fișier, cu regulile din cerință
 void writeTheMatchFormated(Match *match, char *fileOUT)
 {
