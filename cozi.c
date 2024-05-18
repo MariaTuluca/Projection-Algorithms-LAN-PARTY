@@ -12,7 +12,7 @@ Queue* createQueue()
     Queue *q;
     q=(Queue*)malloc(sizeof(Queue));
     if(q == NULL) return NULL;
-    q->front =q->rear = NULL;
+    q->front = q->rear = NULL;
     return q;
 }
 
@@ -31,7 +31,7 @@ void enQueue(Queue *q, Match *v)
 
 Match *deQueue(Queue *q)
 {
-    QueueNode *aux; 
+    QueueNode *aux = q->front; 
     Match *d = aux->subject;
 
     if(q->front == q->rear)
@@ -59,28 +59,3 @@ void deleteQueue(Queue *q)
     q = NULL;
 }
 
-//funcție pentru refacerea cozii de meciuri
-void remakeQueueOfMatches(Queue *matches, StackNode **winners, int *numberOfTeams)
-{//inițializez numărul de teams din stivă cu 0
-    *numberOfTeams = 0;
-
-    while(!isStackEmpty(*winners))
-    {//creez un nou match
-        Match *new_match = malloc(sizeof(Match));
-        if(new_match == NULL)
-        {   printf("Eroare la alocare spațiu new_match!");
-            return;
-        }
-        (*numberOfTeams)++;
-        //prima și a doua echipă din stiva winners vor forma un nou match 
-        Team *team1 = pop(winners);
-        if((*winners)->next != NULL)
-            {   (*numberOfTeams)++;
-                Team *team2 = pop(winners);
-                new_match->team_1 = team1;
-                new_match->team_2 = team2;
-            }
-        //adaug meciul în coadă
-        enQueue(matches, new_match);
-    }
-}

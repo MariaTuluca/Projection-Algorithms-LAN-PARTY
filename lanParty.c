@@ -1,41 +1,36 @@
+#include<math.h>
 #include "liste.h"
 #include "functii-ajutatoare.h"
 #include "cozi.h"
 #include "stive.h"
 #include "trees.h"
 
-void primulTask(ListOfTeams **teamList, int *numberOfTeams, char *fileIn, char* fileOut)
+void primulTask(ListOfTeams **teamList, int *numberOfTeams, char *fileIn, FILE* fileOut)
 {
     FILE *inputDate = fopen(fileIn, "rt");
     if(inputDate == NULL)
-        {
-            printf("Fisierul 'd.in' nu poate fi deschis.\n");
-            return 1;
-        }
-    
+    {   printf("Eroare la deschidere d.in.");
+        exit(1);
+    }
+
     fscanf(inputDate, "%d", numberOfTeams);
-    for(int j=0; j<*numberOfTeams; j++)
+    
+    for(int j=0; j< *numberOfTeams; j++)
     {
-        int nrPlayersOfTeam;
         Team *newTeam = NULL;
         ListOfPlayers *playerList = NULL;
-
-        fscanf(inputDate, "%d", nrPlayersOfTeam);
-        fgetc(inputDate); //golesc buffer
-        //citesc datele pentru players
-        readTeamName(inputDate, &newTeam);
-        readPlayers(inputDate, &playerList, nrPlayersOfTeam);
-        fgetc(inputDate); 
-
+        //citesc datele pentru team și players
+        readDate(inputDate, &newTeam, &playerList);
+        //adaug lista de players la team și echipa la lista de echipe
         addListOfPlayersToTeam(&newTeam, playerList);
-        addTeamToTeamList(teamList, newTeam);
+        addTeamToBegTeamList(teamList, newTeam);
     }    
-
     fclose(inputDate);
+
     writeNamesOfTeams(*teamList, fileOut);
 }
 
-void alDoileaTask(ListOfTeams **teamList, int *numberOfTeams, char *fileOUT)
+void alDoileaTask(ListOfTeams **teamList, int *numberOfTeams, FILE *fileOUT)
 {
     //găsesc cea mai mare putere a lui doi mai mică decat numărul de echipe
     int powerOf2 = 0;
@@ -56,67 +51,65 @@ void alDoileaTask(ListOfTeams **teamList, int *numberOfTeams, char *fileOUT)
     writeNamesOfTeams(*teamList, fileOUT);
 }  
 
-void alTreileaTask(ListOfTeams **teamList, ListOfTeams **the8Finalists, char *fileOUT)
+void alTreileaTask(ListOfTeams **teamList, ListOfTeams **the8Finalists, FILE *fileOUT)
 {   //creez o coadă cu meciuri
     Queue *matches = NULL;
     populateQueue(&matches, *teamList);
-    //creez stiva pentru învingători
-    StackNode *winners = NULL;
+
+    StackNode *winners = NULL;  //creez stiva pentru învingători
     int numberOfRounds = 0, numberOfTeams;
 
     while(numberOfTeams > 1)
     {   numberOfRounds++;
         //scriem în fișier numele rundei și a echipelor, după regula de afișare din cerință 
-        FILE *fout;
-        if((fout = fopen(fileOUT, "at") == NULL))
-            printf("Eroare la deschiderea fișierului de printare runde.");
-        else{
-            fprintf(fout, "\n--- ROUND NO:%d\n", numberOfRounds);
+    
+        fprintf(fileOUT, "\n--- ROUND NO:%d\n", numberOfRounds);
             
-            QueueNode *aux = matches->front;
-            while(aux != NULL)
-            {
-              writeTheMatchFormated(aux->subject, fileOUT);
-              aux = aux->next;
-            }
-            fclose(fout);
+        QueueNode *aux = matches->front;
+        while(aux != NULL)
+        {
+            fprintf(fileOUT, "%-33s-%33s\n", aux->subject->team_1->name, aux->subject->team_2->name);
+            aux = aux->next;
         }
-
+        
         StackNode *losers = NULL; //creez stiva pentru învinși
-
         winnersAndLosersStacks(&winners, &losers, matches);
-        onePointToEveryWinnerPlayer(winners);
-        writeWinnersTeamFormated(numberOfRounds, fileOUT); //scriu toate datele în fișier
+
+        while(!isStackEmpty(winners))
+	    {   ListOfPlayers *aux = winners->subject->players;
+		    if(aux != NULL)     //adaug mereu punctul primului jucător din fiecare echipă, pentru că nu mă interesează punctajul individual al jucătorilor
+		        aux->player->points = aux->player->points + 1;
+
+		    winners = winners->next;    //trec la următoarea echipă
+	    }
+
+        fprintf(fileOUT, "\nWINNERS OF ROUND NO:%d\n", numberOfRounds);
         writeWinnersFormated(winners, fileOUT);
-        deleteStack(losers);
+        deleteStack(&losers);
         //creez iar meciuri cu echipe care au câștigat
-        remakeQueueOfMatches(matches, winners, &numberOfTeams);
+        remakeQueueOfMatches(matches, &winners, &numberOfTeams);
         //dacă am ajuns la cei 8 finaliști, îi stocăm în lista finaliștilor 
         if(numberOfTeams == 8)
-            listOfThe8Finalists(matches->front,the8Finalists);
+            listOfThe8Finalists(matches->front, the8Finalists);
     }
     //eliberez spațiul folosit de stiva de câștigători și coada de meciuri
     deleteQueue(matches);
     deleteStack(&winners);
 }
 
-void alPatruleaTask(ListOfTeams *the8Finalists, ListOfTeams **the8FinalistsInDescendingOrder, char *fileOUT)
+void alPatruleaTask(ListOfTeams *the8Finalists, ListOfTeams **the8FinalistsInDescendingOrder, FILE *fileOUT)
 {//inițializez bst-ul și îl creez în ordine descrescătoare
     BSTNode *bst_root = NULL;
     createBST(&bst_root, the8Finalists);
 
     //afișăm în ordine descrescătoare clasamentul cu ajutorul arborelui
-    FILE *fout;
-    if((fout = fopen(fileOUT, "wt") == NULL))
-    {    fprintf(fout, "\nTOP 8 TEAMS:\n");
-            fclose(fout);
-    }
-    afișareBST(bst_root, the8FinalistsInDescendingOrder, fileOUT);
+    fprintf(fileOUT, "\nTOP 8 TEAMS:\n");
+    afisareBST(bst_root, the8FinalistsInDescendingOrder, fileOUT);
     //eliberez memoria ocupată de bst ul 
     deleteBST(bst_root);
 }
 
-void alCincileaTask(ListOfTeams *the8FinalistsInDescendingOrder, char *fileOUT)
+void alCincileaTask(ListOfTeams *the8FinalistsInDescendingOrder, FILE *fileOUT)
 {//inițializez arborele AVL
     AVLNode *AVL_root = NULL;
 
@@ -126,12 +119,8 @@ void alCincileaTask(ListOfTeams *the8FinalistsInDescendingOrder, char *fileOUT)
     //trec la următoarea
         the8FinalistsInDescendingOrder = the8FinalistsInDescendingOrder->next;
     }
-
     //scriu în fișier cu forma cerută
-    FILE *f;
-    if((f = fopen(fileOUT, "wt")) != NULL)
-        fprintf(f, "\nTHE LEVEL 2 TEAMS ARE:\n");
-    fclose(f);
+    fprintf(fileOUT, "\nTHE LEVEL 2 TEAMS ARE:\n");
     //inițiez o parcurgere DRS pentru afișare în ordine descrescătoare a scorurilor
     int lvl = -1;
     AVL_DRSbrowse(AVL_root, fileOUT, lvl);
@@ -142,43 +131,56 @@ void alCincileaTask(ListOfTeams *the8FinalistsInDescendingOrder, char *fileOUT)
 //funcția main cu apelurile către fiecare task
 int main(int argc, char* argv[])
 {
-    char *input = argv[1];
-
-    FILE *file_tasks = fopen(input, "rt");
-    if(file_tasks == NULL)
+    FILE *inputC = fopen(argv[1], "rt");
+    if(inputC == NULL)
         {   printf("Fisierul 'c.in' nu poate fi deschis.\n");
-            return 1;
+            return 0;
         }
+    //mă folosesc de citire pentru a verifica dacă pot face fiecare task
+    int tasks[5] = {0};
+    for(int j=0; j<5; j++)
+    {   int i;
+        fscanf(inputC, "%d", &i);
+        fscanf(inputC, " ");
+        tasks[j] += i;
+    }
+    fclose(inputC);
+
+    //pregătesc fișierele de date și de ieșire
+    char *inputD = (char*)malloc(15*sizeof(char));
+    strcpy(inputD, argv[3]);
+
+    char *OUTPUT = (char*)malloc(15*sizeof(char));
+    strcpy(OUTPUT, argv[3]);
 
     ListOfTeams *teamList = NULL;
     int numberOfTeams = 0;
-    int tasks[5];
-    
-    for(int j=0; j<5; j++)
-        fscanf(file_tasks, "%d", &tasks[j]);
 
-    fclose(file_tasks);
+    FILE *output = fopen(OUTPUT, "wt");
+    if(output == NULL)
+    {   printf("Probleme la deschidere fisier de afișare nume echipe!");
+        exit(1);
+    }
 
-    if(tasks[0] == 1)
-            primulTask(&teamList, &numberOfTeams, argv[2], argv[3]);
+    if(tasks[0] != 0)
+            primulTask(&teamList, &numberOfTeams, inputD, output);
 
-    if(tasks[1] == 1)
-            alDoileaTask(&teamList, &numberOfTeams, argv[3]);  
+    if(tasks[1] != 0)
+            alDoileaTask(&teamList, &numberOfTeams, output);  
  
     ListOfTeams *the8Finalists = NULL;
-    if(tasks[2] == 1)
-            alTreileaTask(&teamList, &the8Finalists, argv[3]);
-
+    if(tasks[2] != 0)
+            alTreileaTask(&teamList, &the8Finalists, output);
     freeListOfTeams(&teamList);
 
     ListOfTeams *the8FinalistsInDescendingOrder = NULL;
-    if(tasks[3] == 1)
-            alPatruleaTask(the8Finalists, &the8FinalistsInDescendingOrder, argv[3]);
+    if(tasks[3] != 0)
+            alPatruleaTask(the8Finalists, &the8FinalistsInDescendingOrder, output);
 
-    if (tasks[4] == 1)
-            alCincileaTask(the8FinalistsInDescendingOrder, argv[3]);
-    
+    if (tasks[4] != 0)
+            alCincileaTask(the8FinalistsInDescendingOrder, output);
     freeListOfTeams(&the8FinalistsInDescendingOrder);
 
+    fclose(output);
     return 0;
 }

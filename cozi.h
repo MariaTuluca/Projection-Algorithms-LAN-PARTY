@@ -1,7 +1,11 @@
+
+ 
 #include<limits.h>
 #include<stdlib.h>
-#include "stive.h"
+#include "liste.h"
 
+#ifndef COZI_H
+#define COZI_H
 // două structuri pentru definirea cozilor
 typedef struct queueNode{
     Match *subject;
@@ -11,6 +15,8 @@ typedef struct queueNode{
 typedef struct Queue{
     QueueNode *front, *rear;
 }Queue;
+
+#endif
 
 int isQueueEmpty(Queue *q);
 
@@ -22,7 +28,6 @@ Match *deQueue(Queue *q);
 
 void deleteQueue(Queue *q);
 
-void remakeQueueOfMatches(Queue *matches, StackNode **winners, int *numberOfTeams);
 
 
 

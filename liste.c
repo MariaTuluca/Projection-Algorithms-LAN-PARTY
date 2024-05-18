@@ -4,23 +4,32 @@
 
 //funcție pentru adăugare player în listă
 void addPlayerToList(ListOfPlayers **playerList, Player *player)
-{
-    ListOfPlayers *newNode = malloc(sizeof(ListOfPlayers));
+{//verific dacă lista este goală
+    if(*playerList != NULL)
+    { //parcurg până la final lista
+    ListOfPlayers *newList = *playerList;
+    while(newList->next != NULL)
+        {newList = newList->next;}
 
-    if(newNode == NULL)
-    {   printf("Eroare la alocare spațiu newNode in addPlayerToList!");
-        return 1;
+    newList->next = malloc(sizeof(ListOfPlayers));
+    if(newList->next == NULL)
+    {   printf("Eroare la alocare spațiu newList nou element in addPlayerToList!");
+        return;
     }
-    //creez legăturile în lista de players
-    newNode->player = player;
-    if(*playerList == NULL)
-    {   newNode->next = NULL;
-        *playerList = newNode;
+    //creez legătura în lista de players
+    newList->next->player = player;
+    newList->next->next = NULL;
     }
     else{
-            newNode->next = *playerList;
-            *playerList = newNode;
-        }
+    *playerList = malloc(sizeof(ListOfPlayers));
+    if(playerList == NULL)
+    {   printf("Eroare la alocare spațiu lista in addPlayerToList!");
+        return;
+    }
+    //introduc player-ul în listă
+    (*playerList)->player = player;
+    (*playerList)->next = NULL;
+    }    
 }
 
 //funcție pentru adăugarea unei liste de players la echipa aferentă
@@ -30,12 +39,12 @@ void addListOfPlayersToTeam(Team **newTeam, ListOfPlayers *playerList)
 }
 
 //funcție pentru adăugarea echipei formate la începutul listei de echipe
-void addTeamToTeamList(ListOfTeams **teamList, Team *newTeam)
+void addTeamToBegTeamList(ListOfTeams **teamList, Team *newTeam)
 {
     ListOfTeams *newNode = malloc(sizeof(ListOfTeams));
     if(newNode == NULL)
     {   printf("Eroare la alocare spațiu newNode in addTeamToTeamList!");
-        return 1;
+        return;
     }
     //creez legăturile în lista de teams
     newNode->team = newTeam;
@@ -50,11 +59,11 @@ void freeListOfPlayers(ListOfPlayers **playerList)
     {   //creez un auxiliar în care rețin jucătorul
         ListOfPlayers *aux = *playerList;
         free(aux->player->firstName);
-        free(aux->player->lastName);
+        free(aux->player->secondName);
         free(aux->player);
-        free(aux);
 
         *playerList = (*playerList)->next;   //actualizez capătul listei
+        free(aux);
     }
 
 }
@@ -94,12 +103,12 @@ void storeLastTeamsToList(ListOfTeams **finalList, Team *team)
     Team *new_team = malloc(sizeof(Team));
     if(new_team == NULL)
     {   printf("Eroare la alocare spațiu new_team în storeLastTeamsToList!");
-        return 1;
+        return;
     } //numele echipei
     new_team->name = malloc(strlen(team->name) + 1);
     if(new_team->name == NULL)
     {   printf("Eroare la alocare spațiu new_team name în storeLastTeamsToList!");
-        return 1;
+        return;
     }
     strcpy(new_team->name, team->name);
     //players din echipă
@@ -111,29 +120,28 @@ void storeLastTeamsToList(ListOfTeams **finalList, Team *team)
         Player *new_player = malloc(sizeof(Player));
         if(new_player == NULL)
     {   printf("Eroare la alocare spațiu new_player în storeLastTeamsToList!");
-        return 1;
+        return;
     }//primul și al doilea nume
         new_player->firstName = malloc(strlen(aux_player->player->firstName) + 1);
         if(new_player->firstName == NULL)
     {   printf("Eroare la alocare spațiu new_player firstName în storeLastTeamsToList!");
-        return 1;
+        return;
     }
+        new_player->secondName = malloc(strlen(aux_player->player->secondName) + 1);
+        if(new_player->secondName == NULL)
+    {   printf("Eroare la alocare spațiu new_player secondName în storeLastTeamsToList!");
+        return;
+    }       
         strcpy(new_player->firstName, aux_player->player->firstName);
-
-        new_player->lastName = malloc(strlen(aux_player->player->lastName) + 1);
-        if(new_player->lastName == NULL)
-    {   printf("Eroare la alocare spațiu new_player lastName în storeLastTeamsToList!");
-        return 1;
-    }
-        strcpy(new_player->lastName, aux_player->player->lastName);
-    //points
-        new_player->points = malloc(strlen(aux_player->player->points) + 1);
+        strcpy(new_player->secondName, aux_player->player->secondName);
+        //points
+        new_player->points = aux_player->player->points;
         //creez o listă nouă 
         ListOfPlayers *new_PlayerList = malloc(sizeof(ListOfPlayers));
         if(new_PlayerList == NULL)
     {   printf("Eroare la alocare spațiu new_PlayerList în storeLastTeamsToList!");
-        return 1;
-    }//copiem datele în listă
+        return;
+    }//copiez datele în listă
         new_PlayerList->player = new_player;
         new_PlayerList->next = new_team->players;
         new_team->players = new_PlayerList;
@@ -141,40 +149,10 @@ void storeLastTeamsToList(ListOfTeams **finalList, Team *team)
         aux_player = aux_player->next;
     }
     //adaug echipa la listă
-    addTeamToTeamList(finalList, new_team);
+    addTeamToBegTeamList(finalList, new_team);
 }
 
-//funcție principală recursivă pentru stocare date despre finaliști
-void listOfThe8Finalists(QueueNode *matchNode, ListOfTeams **the8Finalists)
-{//stocăm toate datele în lista finală
-	storeLastTeamsToList(the8Finalists, matchNode->subject->team_1);
-	storeLastTeamsToList(the8Finalists, matchNode->subject->team_2);
-
-	if(matchNode->next != NULL)
-		listOfThe8Finalists(the8Finalists, matchNode->next);
-		
-}
-
-//funcție pentru umplere coadă cu meciuri
-void populateQueue(Queue **matches, ListOfTeams *teamList)
-{   //creez coada
-    *matches = createQueue();
-    //verific dacă am două echipe valabile pentru meci nou
-    for( ; teamList != NULL && teamList->next != NULL; teamList = teamList->next->next)
-    {
-        Match *new_match = malloc(sizeof(Match));
-        if(new_match == NULL)
-        {   printf("Eroare la alocare spațiu pentru un meci nou.\n");
-            return 1;
-        }
-        //creez meciul nou și îl pun în coadă
-        new_match->team_1 = teamList->team;
-        new_match->team_2 = (teamList->next)->team;
-        enQueue(*matches, new_match);
-    }
-
-}
-
+//funcție pentru eliberare spațiu ocupat de lista de echipe
 void freeListOfTeams(ListOfTeams **teamList)
 {
     while(*teamList != NULL)

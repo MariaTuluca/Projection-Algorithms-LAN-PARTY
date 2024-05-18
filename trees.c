@@ -1,17 +1,17 @@
 #include "trees.h"
-#include "functii-ajutatoare.h"
+
 
 // funcție pentru nod nou
 BSTNode *BSTnewNode(Team *data)
 {
-    BSTNode *node = (BSTNode *)malloc(sizeof(Node));
+    BSTNode *node = (BSTNode *)malloc(sizeof(deleteBST));
     node->val = data;
     node->left = node->right = NULL;
     return node;
 }
 
 // funcție pentru inserție în bst
-void BST_insertion(BSTNode *bst_root, Team *team)
+BSTNode *BST_insertion(BSTNode *bst_root, Team *team)
 {
     if (bst_root == NULL)
         return BSTnewNode(team);
@@ -26,9 +26,9 @@ void BST_insertion(BSTNode *bst_root, Team *team)
         bst_root->left = BST_insertion(bst_root->left, team);
     else
     { // tratăm cazul cu numele diferite și același scor
-        if (strcmp(team->name, bst_root->val->nume) < 0)
+        if (strcmp(team->name, bst_root->val->name) < 0)
             bst_root->left = BST_insertion(bst_root->left, team);
-        else if (strcmp(team->name, bst_root->val->nume) > 0)
+        else if (strcmp(team->name, bst_root->val->name) > 0)
             bst_root->right = BST_insertion(bst_root->right, team);
     }
 
@@ -51,8 +51,8 @@ void TeamToTeamList(ListOfTeams **BSTlist, Team *team)
     ListOfTeams *new_node = malloc(sizeof(ListOfTeams));
     if (new_node == NULL)
     {
-        printf("Eroare alocare spațiu în TeamToBeginningOfTeamList.\n");
-        return 1;
+        printf("Eroare alocare spațiu în TeamToTeamList.\n");
+        return;
     }
     // aloc datele nodului
     new_node->team = team;
@@ -72,34 +72,25 @@ void TeamToTeamList(ListOfTeams **BSTlist, Team *team)
 }
 
 // funcție pentru afișare arbore bst în ordine descrescătoare
-void afișareBST(BSTNode *bst_root, ListOfTeams **BSTlist, char *fileOUT)
+void afisareBST(BSTNode *bst_root, ListOfTeams **BSTlist, FILE *fileOUT)
 {
     if (bst_root == NULL)
         return;
     // doresc să mă duc în dreapta arborelui, pentru cea mai mare valoare a scorului
-    afișareBST(bst_root->right, BSTlist, fileOUT);
-
-    FILE *fout = fopen(fileOUT, "at");
-    if (!fout)
-    {
-        printf("Eroare la deschidere fișier în afișareBST!");
-        return;
-    }
+    afisareBST(bst_root->right, BSTlist, fileOUT);
     // afișez scorul
-    float score = ScoreOfTeams(bst_root->val);
+    float score = ScoreOfTeam(bst_root->val);
     fprintf(fileOUT, "%-34s-  %.2f\n", bst_root->val->name, score);
     // adaug echipa la începutul listei the8FinalistsInDescendingOrder
-    TeamToBeginningOfTeamList(BSTlist, bst_root->val);
-
-    fclose(fileOUT);
+    TeamToTeamList(BSTlist, bst_root->val);
     // mă deplasez în stânga "root"-ului
-    afișareBST(bst_root->right, BSTlist, fileOUT);
+    afisareBST(bst_root->left, BSTlist, fileOUT);
 }
 
 // funcție recursivă pentru eliberare spațiu bst
 void deleteBST(BSTNode *bst_root)
 {
-    if (root != NULL)
+    if (bst_root != NULL)
     {
         deleteBST(bst_root->right);
         deleteBST(bst_root->left);
@@ -119,8 +110,7 @@ int nodeHeight(AVLNode *node)
 
 //funcția pentru rotație la dreapta
 AVLNode *RightRotation(AVLNode *z)
-{
-    // z este un nod cu factorul de echilibru k egal cu -1
+{   // z este un nod cu factorul de echilibru k egal cu -1
     AVLNode *y = z->left;
     AVLNode *T3 = y->right;
     // Rotire
@@ -135,8 +125,7 @@ AVLNode *RightRotation(AVLNode *z)
 
 //funcție pentru rotașie la stânga
 AVLNode *LeftRotation(AVLNode *z) 
-{
-    // z este un nod cu factorul de echilibru k egal cu 1
+{   // z este un nod cu factorul de echilibru k egal cu 1
     AVLNode *y = z->right;
     AVLNode *T2 = y->left;
     // Rotire
@@ -153,7 +142,7 @@ AVLNode *LeftRotation(AVLNode *z)
 AVLNode *RLRotation(AVLNode *z)
 {
     z->right = RightRotation(z->right);
-    return LefttRotation(z);
+    return LeftRotation(z);
 }
 
 AVLNode *LRRotation(AVLNode *z)
@@ -169,20 +158,20 @@ void whichRotation(AVLNode **node, Team *team, float scoreTeam, float scoreLeftC
     //iau în considerare toate cazurile
     if( k>1 )
     {   if(scoreTeam < scoreLeftChild) //dezechilibru la stânga prin valoare
-            *node = RightRotation(node);
+            *node = RightRotation(node_cpy);
         else if( (scoreTeam == scoreLeftChild) && (strcmp(node_cpy->left->val->name, team->name) > 0)) //dezechilibru la stânga prin nume
-            *node = RightRotation(node);
+            *node = RightRotation(node_cpy);
     }
     else if( k<-1 )
     {   if(scoreTeam > scoreRightChild) //dezechilibru la dreapta prin valoare
-            *node = LeftRotation(node);
+            *node = LeftRotation(node_cpy);
         else if( (scoreTeam == scoreRightChild) && (strcmp(node_cpy->right->val->name, team->name) < 0)) //dezechilibru la dreapta prin nume
-            *node = LeftRotation(node);
+            *node = LeftRotation(node_cpy);
     }
-    else if( k>1 && scoreTeam < scoreLeftChild) //dezechilibru la dreapta - rotații duble
-        *node = RLRotation(node);
+    else if( k>1 && scoreTeam > scoreLeftChild) //dezechilibru la dreapta - rotații duble
+        *node = RLRotation(node_cpy);
     else if( k<-1 && scoreTeam < scoreRightChild) //dezechilibru la stânga - rotații duble
-        *node = LRRotation(node);
+        *node = LRRotation(node_cpy);
 }
 
 //funcție pentru inserarea nodului în AVL
@@ -194,7 +183,6 @@ AVLNode *AVL_insertion(Team *team, AVLNode *node)
         node->val = team;
         node->height = 0; // adăugare ca frunză
         node->left = node->right = NULL;
-        return node;
     }
     // calculez scorurile pentru a putea compara rezultatele
     float scoreTeam, scoreRoot;
@@ -205,22 +193,20 @@ AVLNode *AVL_insertion(Team *team, AVLNode *node)
     else if (scoreTeam > scoreRoot)
         node->right = AVL_insertion(team, node->right);
     else
-    {
+    {   if (strcmp(node->val->name, team->name) < 0)
+            node->right = AVL_insertion(team, node->right);
         if (strcmp(node->val->name, team->name) > 0)
             node->left = AVL_insertion(team, node->left);
-        if (strcmp(node->val->name, team->name) < 0)
-            node->right = AVL_insertion(team, node->right);
     } // nu există chei duplicate
-    // Updatează înălțimea nodurilor strămoș
+    // updatează înălțimea nodurilor strămoș
     float maxim;
     if(nodeHeight(node->left) > nodeHeight(node->right)) 
             maxim = nodeHeight(node->left);
     else maxim = nodeHeight(node->right);
     node->height = 1 + maxim;
 
-    // Află factorul de echilibru al nodului strămoș
+    // află factorul de echilibru al nodului strămoș
     int k = nodeHeight(node->left) - nodeHeight(node->right);
-
     //actualizez scorul
     float scoreLeftOfNode = (node->left != NULL) ? ScoreOfTeam(node->left->val) : 0; 
     float scoreRightOfNode = (node->right != NULL) ? ScoreOfTeam(node->right->val) : 0; 
@@ -231,20 +217,16 @@ AVLNode *AVL_insertion(Team *team, AVLNode *node)
 }
 
 //funcție de parcurgere DRS  a arborelui AVL
-void AVL_DRSbrowse(AVLNode *root, char* fileOUT, int lvl)
+void AVL_DRSbrowse(AVLNode *root, FILE* fileOUT, int lvl)
 {
     if(root != NULL)
     {//dacă există rădăcina, trec la nivelul următor
         lvl++;
         AVL_DRSbrowse(root->right, fileOUT, lvl);
         //deschid fișierul pentru a scrie în el
-        FILE *f;
-        if((f = fopen(fileOUT, "wt")) != NULL)
-        {//afișez echipele de pe nivelul 2 
-            if( lvl == 2)
-                fprintf(f, "%s\n", root->val->name);
-            fclose(f);
-        }
+        if( lvl == 2)
+            fprintf(fileOUT, "%s\n", root->val->name);
+        
         //trec în partea din stânga a arborelui curent
         AVL_DRSbrowse(root->left, fileOUT, lvl);
     }    
@@ -253,7 +235,7 @@ void AVL_DRSbrowse(AVLNode *root, char* fileOUT, int lvl)
 //funcție recursivă pentru eliberare memorie ocupată de AVL
 void deleteAVL(AVLNode *AVL_root)
 {
-    if (root != NULL)
+    if (AVL_root != NULL)
     {
         deleteAVL(AVL_root->right);
         deleteAVL(AVL_root->left);

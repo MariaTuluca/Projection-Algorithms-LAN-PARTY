@@ -1,32 +1,37 @@
 #include<stdlib.h>
 #include<string.h>
 #include "liste.h"
+#include "functii-ajutatoare.h"
 
 //funcții create și luate din curs pentru arbori
-
+#ifndef TREES_H
+#define TREES_H
 //structură pentru binary search tree (BST)
 typedef struct bstNode
-{   Team *val;
+{   
+    Team *val;
     struct bstNode *left, *right;
 }BSTNode;
 
 //structură pentru arbore AVL
-typedef struct avlNode
+typedef struct AVLNode
 {
     int height;
     Team *val;
-    struct avlNnode;
+    struct AVLNode *left, *right;
 }AVLNode;
+
+#endif
 
 BSTNode *BSTnewNode(Team *data);
 
-void BST_insertion(BSTNode *bst_root, Team *team);
+BSTNode *BST_insertion(BSTNode *bst_root, Team *team);
 
 void createBST(BSTNode **root, ListOfTeams *the8Finalists);
 
 void TeamToTeamList(ListOfTeams **BSTlist, Team *team);
 
-void afișareBST(BSTNode *bst_root, ListOfTeams **BSTlist, char *fileOUT);
+void afisareBST(BSTNode *bst_root, ListOfTeams **BSTlist, FILE *fileOUT);
 
 void deleteBST(BSTNode *bst_root);
 
@@ -44,7 +49,7 @@ void whichRotation(AVLNode **node, Team *team, float scoreTeam, float scoreLeftC
 
 AVLNode *AVL_insertion(Team *team, AVLNode *node);
 
-void AVL_DRSbrowse(AVLNode *root, char* fileOUT, int lvl);
+void AVL_DRSbrowse(AVLNode *root, FILE* fileOUT, int lvl);
 
 void deleteAVL(AVLNode *AVL_root);
 
