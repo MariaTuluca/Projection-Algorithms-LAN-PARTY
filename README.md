@@ -1,6 +1,6 @@
-Descrierea temei 1 - LAN PARTY 2024
+Project 1 - LAN PARTY 2024
 
-Tema mea este concepută pentru a gestiona o competiție LanParty, cu generare și procesare de meciuri, determinare câștigători și clasarea echipelor din final.
+Proiectul meu este conceput pentru a gestiona o competiție LanParty, cu generare și procesare de meciuri, determinare câștigători și clasarea echipelor din final.
 
 Structura proiectului
 
